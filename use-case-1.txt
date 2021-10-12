@@ -1,0 +1,44 @@
+
+Twelve Data
+https://api.twelvedata.com/time_series?start_date=2021-10-01&outputsize=5&symbol=aapl:NASDAQ,ETH/BTC:Huobi,TRP:TSX,INFY:BSE,IXIC&interval=1day&apikey=431986d803ab484e981829d722125b07
+
+---------------------------------------------------------------------------------------
+script-raw-data
+
+{
+	As per the API........
+
+}
+
+topic: top-gainer-top-looser
+{
+	"symbol": "XYZ",
+	"stock_name": "name of the stock",
+	"date": "MMDDYYYY",
+	"change_percentage": 0.54,
+	"change_price": 12.00,
+	"closing_price": 250.00,
+	"currency": "USD",
+	"status": "G/L"
+}
+
+
+
+topic: chart-data
+{
+	"symbol": "XYZ",
+	"stock_name": "name of the stock",
+	"date": "MMDDYYYY",
+	"closing_price": 250.00,
+	"currency": "USD"
+}
+
+---------------------------------------------------------------------------------------
+
+TOP_GAINER_LOOSER  
+symbol  stock_name  date  change_percentage  change_price  closing_price  currency  status  created_by created_date updated_by updated_date
+
+CHART_DATA
+symbol  stock_name  date closing_price  currency  created_by created_date updated_by updated_date
+
+---------------------------------------------------------------------------------------
