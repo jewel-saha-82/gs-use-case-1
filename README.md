@@ -1,2 +1,2 @@
 # gs-use-case-1
-This is test.
+This is second branch.
