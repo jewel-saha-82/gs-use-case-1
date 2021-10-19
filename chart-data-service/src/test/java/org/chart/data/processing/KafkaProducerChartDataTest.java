@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.concurrent.ExecutionException;
 
 import org.assertj.core.api.BDDAssertions;
-import org.chart.data.processing.kafka.KafkaProducer;
+import org.chart.data.processing.kafka.KafkaProducerChartData;
 import org.chart.data.processing.model.ChartData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,13 +14,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-public class KafkaProducerTest {
+public class KafkaProducerChartDataTest {
 
 	@Autowired
-	private KafkaProducer kafkaProducer;
+	private KafkaProducerChartData kafkaProducer;
 
 	@Test
-	@DisplayName(value = "Test for kafka producer")
+	@DisplayName(value = "Test for kafka producer for chart-data")
 	void producerTest() throws InterruptedException, ExecutionException {
 
 		// given

@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class KafkaProducer {
+public class KafkaProducerChartData {
 
 	Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 
@@ -26,7 +26,7 @@ public class KafkaProducer {
 	@Autowired
 	private KafkaTemplate<String, ChartData> kafkaTemplate;
 
-	public boolean sendMessage(ChartData chartData) throws InterruptedException, ExecutionException {
+	public boolean sendMessage(final ChartData chartData) throws InterruptedException, ExecutionException {
 
 		BoolWrap boolWrap = new BoolWrap();
 
