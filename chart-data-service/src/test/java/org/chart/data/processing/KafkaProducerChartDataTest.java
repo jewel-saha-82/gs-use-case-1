@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.concurrent.ExecutionException;
 
-import org.assertj.core.api.BDDAssertions;
 import org.chart.data.processing.kafka.producer.KafkaProducerChartData;
 import org.chart.data.processing.model.ChartData;
 import org.junit.jupiter.api.DisplayName;
@@ -27,9 +26,8 @@ public class KafkaProducerChartDataTest {
 		ChartData chartData = new ChartData("AAPL", "Apple Inc.", LocalDate.now(), new BigDecimal("120.22"), "USD");
 
 		// when
-		boolean status = kafkaProducer.sendMessage(chartData);
+		kafkaProducer.sendMessage(chartData);
 
 		// then
-		BDDAssertions.then(status).isEqualTo(true);
 	}
 }

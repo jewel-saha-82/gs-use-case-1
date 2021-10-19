@@ -2,7 +2,6 @@ package org.chart.data.processing;
 
 import java.util.concurrent.ExecutionException;
 
-import org.assertj.core.api.BDDAssertions;
 import org.chart.data.processing.kafka.producer.KafkaProducerScriptRawData;
 import org.chart.data.processing.model.MetaModel;
 import org.chart.data.processing.model.RootModel;
@@ -30,9 +29,8 @@ public class KafkaProducerScriptRawDataTest {
 		RootModel rootModel = new RootModel(metaModel, valuesModel, "ok");
 
 		// when
-		boolean status = kafkaProducer.sendMessage(rootModel);
+		kafkaProducer.sendMessage(rootModel);
 
 		// then
-		BDDAssertions.then(status).isEqualTo(true);
 	}
 }

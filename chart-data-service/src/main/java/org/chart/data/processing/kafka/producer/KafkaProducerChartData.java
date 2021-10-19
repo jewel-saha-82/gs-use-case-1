@@ -26,9 +26,7 @@ public class KafkaProducerChartData {
 	@Autowired
 	private KafkaTemplate<String, ChartData> kafkaTemplate;
 
-	public boolean sendMessage(final ChartData chartData) throws InterruptedException, ExecutionException {
-
-		BoolWrap boolWrap = new BoolWrap();
+	public void sendMessage(final ChartData chartData) throws InterruptedException, ExecutionException {
 
 		ListenableFuture<SendResult<String, ChartData>> future = kafkaTemplate.send(topic, chartData);
 
@@ -41,22 +39,15 @@ public class KafkaProducerChartData {
 			@Override
 			public void onSuccess(final SendResult<String, ChartData> message) {
 				this.message = message;
-				boolWrap.status = true;
 				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
-				boolWrap.status = false;
 				logger.error("unable to send message = " + message, throwable);
 			}
 		});
 
-		return boolWrap.status;
-	}
-
-	class BoolWrap {
-		boolean status = false;
 	}
 
 }

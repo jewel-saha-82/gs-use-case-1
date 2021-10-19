@@ -26,9 +26,7 @@ public class KafkaProducerScriptRawData {
 	@Autowired
 	private KafkaTemplate<String, RootModel> kafkaTemplate;
 
-	public boolean sendMessage(final RootModel rootModel) throws InterruptedException, ExecutionException {
-
-		BoolWrap boolWrap = new BoolWrap();
+	public void sendMessage(final RootModel rootModel) throws InterruptedException, ExecutionException {
 
 		ListenableFuture<SendResult<String, RootModel>> future = kafkaTemplate.send(topic, rootModel);
 
@@ -41,22 +39,14 @@ public class KafkaProducerScriptRawData {
 			@Override
 			public void onSuccess(final SendResult<String, RootModel> message) {
 				this.message = message;
-				boolWrap.status = true;
 				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
-				boolWrap.status = false;
 				logger.error("unable to send message = " + message, throwable);
 			}
 		});
-
-		return boolWrap.status;
-	}
-
-	class BoolWrap {
-		boolean status = false;
 	}
 
 }
