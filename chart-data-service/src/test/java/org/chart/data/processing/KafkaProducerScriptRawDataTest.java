@@ -3,7 +3,7 @@ package org.chart.data.processing;
 import java.util.concurrent.ExecutionException;
 
 import org.assertj.core.api.BDDAssertions;
-import org.chart.data.processing.kafka.KafkaProducerScriptRawData;
+import org.chart.data.processing.kafka.producer.KafkaProducerScriptRawData;
 import org.chart.data.processing.model.MetaModel;
 import org.chart.data.processing.model.RootModel;
 import org.chart.data.processing.model.ValuesModel;

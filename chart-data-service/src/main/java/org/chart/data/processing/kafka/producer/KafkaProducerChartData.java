@@ -1,4 +1,4 @@
-package org.chart.data.processing.kafka;
+package org.chart.data.processing.kafka.producer;
 
 import java.util.concurrent.ExecutionException;
 
