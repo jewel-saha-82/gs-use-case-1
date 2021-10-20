@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import org.chart.data.processing.kafka.producer.KafkaProducerChartData;
 import org.chart.data.processing.model.ChartData;
 import org.chart.data.processing.model.RootModel;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class KafkaConsumerScriptRawData {
+	
+	Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 
 	// @Value("${kafka.topic.chart-data}")
 	private final String topic = "script-raw-data";
@@ -26,6 +29,8 @@ public class KafkaConsumerScriptRawData {
 
 	@KafkaListener(topics = topic, groupId = "chart-data-consumer-grp")
 	public void consumeMessage(final RootModel rootModel) throws InterruptedException, ExecutionException {
+		
+		logger.info("Consumer thread = {}", Thread.currentThread());
 		
 		System.out.println("Consumed message: " + rootModel);
 		
