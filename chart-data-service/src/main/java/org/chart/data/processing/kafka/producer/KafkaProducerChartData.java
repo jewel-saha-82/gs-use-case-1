@@ -30,8 +30,6 @@ public class KafkaProducerChartData {
 
 		ListenableFuture<SendResult<String, ChartData>> future = kafkaTemplate.send(topic, chartData);
 
-		future.get();
-
 		future.addCallback(new ListenableFutureCallback<SendResult<String, ChartData>>() {
 
 			private SendResult<String, ChartData> message;

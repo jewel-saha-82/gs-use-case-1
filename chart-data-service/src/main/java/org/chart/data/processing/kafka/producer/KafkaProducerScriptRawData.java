@@ -30,8 +30,6 @@ public class KafkaProducerScriptRawData {
 
 		ListenableFuture<SendResult<String, RootModel>> future = kafkaTemplate.send(topic, rootModel);
 
-		future.get();
-
 		future.addCallback(new ListenableFutureCallback<SendResult<String, RootModel>>() {
 
 			private SendResult<String, RootModel> message;
