@@ -38,13 +38,13 @@ public class KafkaProducerScriptRawData {
 			public void onSuccess(final SendResult<String, RootModel> message) {
 				this.message = message;
 				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
-				logger.info("Raw data producer thread = {}", Thread.currentThread());
+				//logger.info("Raw data producer thread = {}", Thread.currentThread());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
 				logger.error("unable to send message = " + message, throwable);
-				logger.info("Raw data producer thread = {}", Thread.currentThread());
+				//logger.info("Raw data producer thread = {}", Thread.currentThread());
 			}
 		});
 	}

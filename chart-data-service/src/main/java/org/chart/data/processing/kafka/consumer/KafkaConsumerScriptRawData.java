@@ -32,7 +32,7 @@ public class KafkaConsumerScriptRawData {
 	@KafkaListener(topics = topic, groupId = "chart-data-consumer-grp")
 	public void consumeMessage(List<ConsumerRecord<String, RootModel>> records) {
 
-		logger.info("Consumer thread = {}", Thread.currentThread());
+		//logger.info("Consumer thread = {}", Thread.currentThread());
 
 		records.stream().forEach(x -> {
 

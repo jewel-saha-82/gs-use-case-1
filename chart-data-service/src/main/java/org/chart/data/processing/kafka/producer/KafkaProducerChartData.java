@@ -38,13 +38,13 @@ public class KafkaProducerChartData {
 			public void onSuccess(final SendResult<String, ChartData> message) {
 				this.message = message;
 				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
-				logger.info("Chart data producer thread = {}", Thread.currentThread());
+				//logger.info("Chart data producer thread = {}", Thread.currentThread());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
 				logger.error("unable to send message = " + message, throwable);
-				logger.info("Chart data producer thread = {}", Thread.currentThread());
+				//logger.info("Chart data producer thread = {}", Thread.currentThread());
 			}
 		});
 

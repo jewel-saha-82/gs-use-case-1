@@ -29,7 +29,8 @@ public class KafkaProducerScriptRawDataTest {
 		RootModel rootModel = new RootModel(metaModel, valuesModel, "ok");
 
 		// when
-		kafkaProducer.sendMessage(rootModel);
+		for (int i = 0; i < 100; i++)
+			kafkaProducer.sendMessage(rootModel);
 
 		// then
 	}
