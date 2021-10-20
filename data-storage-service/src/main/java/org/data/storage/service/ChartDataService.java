@@ -28,8 +28,9 @@ public class ChartDataService {
 	}
 	
 	@Transactional
-	public void deleteChartData(int id) {
+	public int deleteChartData(int id) {
 		chartDataDAO.deleteChartData(id);
+		return id;
 	}
 	
 }
