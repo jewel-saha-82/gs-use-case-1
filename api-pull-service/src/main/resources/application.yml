@@ -1,0 +1,8 @@
+
+server:
+  port: 8081
+
+
+kafka:
+  bootstrap-server: 127.0.0.1:9092
+  topic: demo_topic

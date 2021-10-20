@@ -41,7 +41,7 @@ public class TwelveDataController {
         kafkaRootModel.setStatus(rootModel.getStatus());
         for(ValuesModel valuesModel : rootModel.getValues()){
             kafkaRootModel.setValue(valuesModel);
-            logger.info("output of kafka producer: "+ kafkaRootModel);
+            logger.info("output of kafka producer: ", kafkaRootModel);
             kafkaTemplate.send(topic, kafkaRootModel);
         }
     }

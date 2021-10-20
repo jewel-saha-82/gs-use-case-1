@@ -17,25 +17,6 @@ import java.util.Map;
 @Configuration
 public class KafkaConfiguration {
 
-   /* @Value("${kafka.bootstrap-server")
-    private String bootStrapServer;
-
-    @Bean
-    public ProducerFactory<String, RootModel> producerFactory(){
-        Map<String,Object> config = new HashMap<>();
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,bootStrapServer);
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        return new DefaultKafkaProducerFactory<>(config);
-    }
-
-    @Bean
-    public KafkaTemplate<String, RootModel> kafkaTemplate() {
-        return new KafkaTemplate<String, RootModel>(producerFactory());
-    }*/
-
-
-
     @Value("${kafka.bootstrap-server}")
     private String bootstrapServer;
 
