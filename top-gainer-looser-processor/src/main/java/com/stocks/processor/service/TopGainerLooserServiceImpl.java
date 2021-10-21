@@ -30,7 +30,7 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
         if(Objects.isNull(metaModel)){
             metaModel = rootModel.getMeta();
         }
-        stocksData.add(rootModel.getValues());
+        stocksData.add(rootModel.getValue());
     }
 
     /**
