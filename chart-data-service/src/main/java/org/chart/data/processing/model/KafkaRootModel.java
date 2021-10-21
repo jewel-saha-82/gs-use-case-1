@@ -1,14 +1,19 @@
 package org.chart.data.processing.model;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class RootModel {
-	private MetaModel meta;
-	private ValuesModel value;
-	private String status;
+@AllArgsConstructor
+public class KafkaRootModel {
+
+    private MetaModel meta;
+
+    private ValuesModel value;
+
+    private String status;
+
 }

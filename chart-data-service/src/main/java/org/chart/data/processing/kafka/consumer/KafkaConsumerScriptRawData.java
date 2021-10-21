@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.api.service.model.KafkaRootModel;
 import org.chart.data.processing.kafka.producer.KafkaProducerChartData;
 import org.chart.data.processing.model.ChartData;
-import org.chart.data.processing.model.RootModel;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -29,23 +30,23 @@ public class KafkaConsumerScriptRawData {
 	@Autowired
 	private KafkaProducerChartData kafkaProducerChartData;
 
-	@KafkaListener(topics = topic, groupId = "chart-data-consumer-grp")
-	public void consumeMessage(List<ConsumerRecord<String, RootModel>> records) {
+	@KafkaListener(topics = topic, groupId = "chart-data-consumer-grp", containerFactory = "kafkaListenerContainerFactory")
+	public void consumeMessage(List<ConsumerRecord<String, KafkaRootModel>> records) {
 
 		//logger.info("Consumer thread = {}", Thread.currentThread());
 
 		records.stream().forEach(x -> {
 
-			RootModel rootModel = x.value();
+			KafkaRootModel KafkaRootModel = x.value();
 
-			System.out.println("Consumed message: " + rootModel);
+			System.out.println("Consumed message: " + KafkaRootModel);
 
-			ChartData chartData = ChartData.builder().symbol(rootModel.getMeta().getSymbol())
-					.stockName(rootModel.getMeta().getSymbol())
-					.date(LocalDate.parse(rootModel.getValue().getDatetime(),
+			ChartData chartData = ChartData.builder().symbol(KafkaRootModel.getMeta().getSymbol())
+					.stockName(KafkaRootModel.getMeta().getSymbol())
+					.date(LocalDate.parse(KafkaRootModel.getValue().getDatetime(),
 							DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-					.closingPrice(new BigDecimal(rootModel.getValue().getClose()))
-					.currency(rootModel.getMeta().getCurrency()).build();
+					.closingPrice(new BigDecimal(KafkaRootModel.getValue().getClose()))
+					.currency(KafkaRootModel.getMeta().getCurrency()).build();
 
 			try {
 				kafkaProducerChartData.sendMessage(chartData);
