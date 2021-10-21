@@ -1,0 +1,10 @@
+server:
+  port: 8082
+
+
+kafka:
+  bootstrap-server: 127.0.0.1:9092
+  groupId: raw-data-consumer
+  consumerTopic: script-raw-data
+  producerTopic: top-gainer-top-looser
+
