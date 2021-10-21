@@ -2,7 +2,7 @@ package org.chart.data.processing.kafka.producer;
 
 import java.util.concurrent.ExecutionException;
 
-import org.api.service.model.KafkaRootModel;
+import org.chart.data.processing.model.RootModel;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,27 +24,27 @@ public class KafkaProducerScriptRawData {
 	private String topic;
 
 	@Autowired
-	private KafkaTemplate<String, KafkaRootModel> kafkaTemplate;
+	private KafkaTemplate<String, RootModel> kafkaTemplate;
 
-	public void sendMessage(final KafkaRootModel KafkaRootModel) throws InterruptedException, ExecutionException {
+	public void sendMessage(final RootModel KafkaRootModel) throws InterruptedException, ExecutionException {
 
-		ListenableFuture<SendResult<String, KafkaRootModel>> future = kafkaTemplate.send(topic, KafkaRootModel);
+		ListenableFuture<SendResult<String, RootModel>> future = kafkaTemplate.send(topic, KafkaRootModel);
 
-		future.addCallback(new ListenableFutureCallback<SendResult<String, KafkaRootModel>>() {
+		future.addCallback(new ListenableFutureCallback<SendResult<String, RootModel>>() {
 
-			private SendResult<String, KafkaRootModel> message;
+			private SendResult<String, RootModel> message;
 
 			@Override
-			public void onSuccess(final SendResult<String, KafkaRootModel> message) {
+			public void onSuccess(final SendResult<String, RootModel> message) {
 				this.message = message;
 				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
-				//logger.info("Raw data producer thread = {}", Thread.currentThread());
+				// logger.info("Raw data producer thread = {}", Thread.currentThread());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
 				logger.error("unable to send message = " + message, throwable);
-				//logger.info("Raw data producer thread = {}", Thread.currentThread());
+				// logger.info("Raw data producer thread = {}", Thread.currentThread());
 			}
 		});
 	}

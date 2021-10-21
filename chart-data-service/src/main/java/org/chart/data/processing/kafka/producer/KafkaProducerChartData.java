@@ -24,11 +24,11 @@ public class KafkaProducerChartData {
 	private String topic;
 
 	@Autowired
-	private KafkaTemplate<String, ChartData> kafkaTemplate;
+	private KafkaTemplate<String, ChartData> kafkaTemplate2;
 
 	public void sendMessage(final ChartData chartData) throws InterruptedException, ExecutionException {
 
-		ListenableFuture<SendResult<String, ChartData>> future = kafkaTemplate.send(topic, chartData);
+		ListenableFuture<SendResult<String, ChartData>> future = kafkaTemplate2.send(topic, chartData);
 
 		future.addCallback(new ListenableFutureCallback<SendResult<String, ChartData>>() {
 
@@ -38,13 +38,13 @@ public class KafkaProducerChartData {
 			public void onSuccess(final SendResult<String, ChartData> message) {
 				this.message = message;
 				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
-				//logger.info("Chart data producer thread = {}", Thread.currentThread());
+				// logger.info("Chart data producer thread = {}", Thread.currentThread());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
 				logger.error("unable to send message = " + message, throwable);
-				//logger.info("Chart data producer thread = {}", Thread.currentThread());
+				// logger.info("Chart data producer thread = {}", Thread.currentThread());
 			}
 		});
 

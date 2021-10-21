@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class KafkaRootModel {
+public class RootModel {
 
     private MetaModel meta;
 

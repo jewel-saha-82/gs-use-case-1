@@ -2,11 +2,10 @@ package org.chart.data.processing;
 
 import java.util.concurrent.ExecutionException;
 
-import org.api.service.model.KafkaRootModel;
 import org.chart.data.processing.kafka.producer.KafkaProducerScriptRawData;
-import org.api.service.model.MetaModel;
-
-import org.api.service.model.ValuesModel;
+import org.chart.data.processing.model.MetaModel;
+import org.chart.data.processing.model.RootModel;
+import org.chart.data.processing.model.ValuesModel;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ public class KafkaProducerScriptRawDataTest {
 		MetaModel metaModel = new MetaModel("AAPL", "1day", "USD", "America/New_York", "NASDAQ", "Common Stock");
 		ValuesModel valuesModel = new ValuesModel("2021-10-11", "142.27000", "144.81000", "141.81000", "142.81000",
 				"63012662");
-		KafkaRootModel KafkaRootModel = new KafkaRootModel(metaModel, valuesModel, "ok");
+		RootModel KafkaRootModel = new RootModel(metaModel, valuesModel, "ok");
 
 		// when
 		for (int i = 0; i < 100; i++)

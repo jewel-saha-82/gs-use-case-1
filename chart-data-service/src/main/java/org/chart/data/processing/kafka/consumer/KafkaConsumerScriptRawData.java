@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.api.service.model.KafkaRootModel;
 import org.chart.data.processing.kafka.producer.KafkaProducerChartData;
 import org.chart.data.processing.model.ChartData;
-
+import org.chart.data.processing.model.RootModel;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -24,20 +23,19 @@ public class KafkaConsumerScriptRawData {
 
 	Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 
-	// @Value("${kafka.topic.chart-data}")
 	private final String topic = "script-raw-data";
 
 	@Autowired
 	private KafkaProducerChartData kafkaProducerChartData;
 
-	@KafkaListener(topics = topic, groupId = "chart-data-consumer-grp", containerFactory = "kafkaListenerContainerFactory")
-	public void consumeMessage(List<ConsumerRecord<String, KafkaRootModel>> records) {
+	@KafkaListener(topics = topic, groupId = "script-raw-consumer-grp", containerFactory = "kafkaListenerContainerFactory")
+	public void consumeMessage(List<ConsumerRecord<String, RootModel>> records) {
 
-		//logger.info("Consumer thread = {}", Thread.currentThread());
+		// logger.info("Consumer thread = {}", Thread.currentThread());
 
 		records.stream().forEach(x -> {
 
-			KafkaRootModel KafkaRootModel = x.value();
+			RootModel KafkaRootModel = x.value();
 
 			System.out.println("Consumed message: " + KafkaRootModel);
 
