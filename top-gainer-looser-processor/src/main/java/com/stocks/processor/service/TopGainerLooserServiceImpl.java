@@ -50,7 +50,7 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
         TopGainerLooserData topGainerData = new TopGainerLooserData();
         topGainerData.setSymbol(metaModel.getSymbol());
         topGainerData.setStock_name(metaModel.getSymbol());
-        topGainerData.setDate(LocalDate.parse(maxValue.getDatetime().split(" ")[0]));
+        topGainerData.setDate(maxValue.getDatetime());
         topGainerData.setChange_price(String.valueOf(
                 Float.valueOf(maxValue.getClose()) - Float.valueOf(maxValue.getOpen())));
         topGainerData.setClosing_price(maxValue.getClose());
@@ -65,7 +65,7 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
         TopGainerLooserData topLooserData = new TopGainerLooserData();
         topLooserData.setSymbol(metaModel.getSymbol());
         topLooserData.setStock_name(metaModel.getSymbol());
-        topLooserData.setDate(LocalDate.parse(minValue.getDatetime().split(" ")[0]));
+        topLooserData.setDate(minValue.getDatetime());
         topLooserData.setChange_price(String.valueOf(
                 Float.valueOf(minValue.getClose()) - Float.valueOf(minValue.getOpen())));
         topLooserData.setClosing_price(minValue.getClose());
