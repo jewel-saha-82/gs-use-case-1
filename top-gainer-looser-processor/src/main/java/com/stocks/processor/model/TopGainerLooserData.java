@@ -2,8 +2,6 @@ package com.stocks.processor.model;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 
 @Data
 public class TopGainerLooserData {
@@ -12,7 +10,7 @@ public class TopGainerLooserData {
 
     private String stock_name;
 
-    private LocalDate date;
+    private String date;
 
     private String change_price;
 
