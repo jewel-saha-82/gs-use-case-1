@@ -7,6 +7,7 @@ import com.stocks.processor.producer.TopGainerLooserProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -46,29 +47,34 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
         ValuesModel maxValue = stocksData.stream().
                 max(Comparator.comparing(ValuesModel::getClose))
                 .get();
+        TopGainerLooserData topGainerData = new TopGainerLooserData();
+        topGainerData.setSymbol(metaModel.getSymbol());
+        topGainerData.setStock_name(metaModel.getSymbol());
+        topGainerData.setDate(LocalDate.parse(maxValue.getDatetime().split(" ")[0]));
+        topGainerData.setChange_price(String.valueOf(
+                Float.valueOf(maxValue.getClose()) - Float.valueOf(maxValue.getOpen())));
+        topGainerData.setClosing_price(maxValue.getClose());
+        topGainerData.setCurrency(metaModel.getCurrency());
+        topGainerData.setStatus(Constants.GAINER);
+        producer.produceTopGainerLooser(topGainerData);
+
 
         ValuesModel minValue = stocksData.stream().
                 min(Comparator.comparing(ValuesModel::getClose))
                 .get();
+        TopGainerLooserData topLooserData = new TopGainerLooserData();
+        topLooserData.setSymbol(metaModel.getSymbol());
+        topLooserData.setStock_name(metaModel.getSymbol());
+        topLooserData.setDate(LocalDate.parse(minValue.getDatetime().split(" ")[0]));
+        topLooserData.setChange_price(String.valueOf(
+                Float.valueOf(minValue.getClose()) - Float.valueOf(minValue.getOpen())));
+        topLooserData.setClosing_price(minValue.getClose());
+        topLooserData.setCurrency(metaModel.getCurrency());
+        topLooserData.setStatus(Constants.LOOSER);
+        producer.produceTopGainerLooser(topLooserData);
 
-        List<StockValueData> stockValueDataList = new ArrayList<>();
-
-        StockValueData gainerValueData = new StockValueData(maxValue);
-        gainerValueData.setProfitStatus(Constants.GAINER);
-        stockValueDataList.add(gainerValueData);
-
-        StockValueData looserValueData = new StockValueData(minValue);
-        looserValueData.setProfitStatus(Constants.LOOSER);
-        stockValueDataList.add(looserValueData);
-
-        TopGainerLooserData topGainerLooserData = new TopGainerLooserData();
-        topGainerLooserData.setMetaModel(metaModel);
-        topGainerLooserData.setTopGainerLooserDataList(stockValueDataList);
-
-        producer.produceTopGainerLooser(topGainerLooserData);
         clearStocksData();
-
-        return topGainerLooserData;
+        return topGainerData;
     }
 
     /**

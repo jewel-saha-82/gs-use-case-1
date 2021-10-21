@@ -2,13 +2,24 @@ package com.stocks.processor.model;
 
 import lombok.Data;
 
-import java.util.List;
+import java.time.LocalDate;
+
 
 @Data
 public class TopGainerLooserData {
 
-    private MetaModel metaModel;
+    private String symbol;
 
-    private List<StockValueData> topGainerLooserDataList;
+    private String stock_name;
+
+    private LocalDate date;
+
+    private String change_price;
+
+    private String closing_price;
+
+    private String currency;
+
+    private String status;
 
 }
