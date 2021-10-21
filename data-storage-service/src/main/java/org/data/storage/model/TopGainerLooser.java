@@ -27,12 +27,8 @@ public class TopGainerLooser {
 	private String stock_name;
 	
 	@Column(name="date")
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private LocalDate date;
-	
-	@Column(name="change_percentage")
-	private float change_percentage;
-	
+	private String date;
+		
 	@Column(name="change_price")
 	private float change_price;
 	
@@ -48,13 +44,12 @@ public class TopGainerLooser {
 	public TopGainerLooser() {
 	}
 	
-	public TopGainerLooser(int id, String symbol, String stock_name, LocalDate date, float change_percentage,
+	public TopGainerLooser(int id, String symbol, String stock_name, String date,
 			float change_price, float closing_price, String currency, String status) {
 		this.id = id;
 		this.symbol = symbol;
 		this.stock_name = stock_name;
 		this.date = date;
-		this.change_percentage = change_percentage;
 		this.change_price = change_price;
 		this.closing_price = closing_price;
 		this.currency = currency;
@@ -87,20 +82,12 @@ public class TopGainerLooser {
 		this.stock_name = stock_name;
 	}
 
-	public LocalDate getDate() {
+	public String getDate() {
 		return date;
 	}
 
-	public void setDate(LocalDate date) {
+	public void setDate(String date) {
 		this.date = date;
-	}
-
-	public float getChange_percentage() {
-		return change_percentage;
-	}
-
-	public void setChange_percentage(float change_percentage) {
-		this.change_percentage = change_percentage;
 	}
 
 	public float getChange_price() {
@@ -138,7 +125,7 @@ public class TopGainerLooser {
 	@Override
 	public String toString() {
 		return "TopGainerLooser [id=" + id + ", symbol=" + symbol + ", stock_name=" + stock_name + ", date=" + date
-				+ ", change_percentage=" + change_percentage + ", change_price=" + change_price + ", closing_price="
+				+ ", change_price=" + change_price + ", closing_price="
 				+ closing_price + ", currency=" + currency + ", status=" + status + "]";
 	}
 	

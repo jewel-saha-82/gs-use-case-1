@@ -46,8 +46,8 @@ class TopGainerLooserControllerTest {
 	void getChartData() throws Exception {
 		Mockito.when(topGainerLooserService.getDatas())
 		.thenReturn(Stream.of(
-				new TopGainerLooser(1,"ABC","Stock1",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available"),
-				new TopGainerLooser(2,"XYZ","Stock1",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available"))
+				new TopGainerLooser(1,"ABC","Stock1","date", (float) 12.0, (float) 250.0,"INR","Available"),
+				new TopGainerLooser(2,"XYZ","Stock1","date", (float) 12.0, (float) 250.0,"INR","Available"))
 				.collect(Collectors.toList()));
 		
 		mockMvc.perform(get("/gainerlooser"))
@@ -62,7 +62,7 @@ class TopGainerLooserControllerTest {
 	@Test
 	void getChartDataById() throws Exception {
 		Mockito.when(topGainerLooserService.getData(anyInt()))
-		.thenReturn(new TopGainerLooser(2,"XYZ","Stock1",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available"));
+		.thenReturn(new TopGainerLooser(2,"XYZ","Stock1","date", (float) 12.0, (float) 250.0,"INR","Available"));
 		
 		mockMvc.perform(get("/gainerlooser/1"))
 		.andExpect(status().isOk())
@@ -80,7 +80,7 @@ class TopGainerLooserControllerTest {
 	
 	@Test
 	public void saveChartData() throws Exception {
-		TopGainerLooser topGainerLooser = new TopGainerLooser(2,"XYZ","Stock1",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available");
+		TopGainerLooser topGainerLooser = new TopGainerLooser(2,"XYZ","Stock1","date", (float) 12.0, (float) 250.0,"INR","Available");
 
         String gainerlooserJson = "{\"symbol\":\"ABC\",\"stock_name\":\"Stock1\",\"date\":\"2021-10-18\",\"change_percentage\":0.54,\"change_price\":12,\"closing_price\":250,\"currency\":\"USD\",\"status\":\"available\"}";
         

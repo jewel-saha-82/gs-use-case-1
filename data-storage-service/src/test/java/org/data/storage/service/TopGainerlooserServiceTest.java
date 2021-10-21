@@ -33,8 +33,8 @@ class TopGainerlooserServiceTest {
 	public void getDataTest() {
 		when(repository.getGainerLooser())
 		.thenReturn(Stream.of(
-				new TopGainerLooser(1,"ABC","Stock1",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available"),
-				new TopGainerLooser(1,"XYZ","Stock2",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available"))
+				new TopGainerLooser(1,"ABC","Stock1","date", (float) 12.0, (float) 250.0,"INR","Available"),
+				new TopGainerLooser(1,"XYZ","Stock2","date", (float) 12.0, (float) 250.0,"INR","Available"))
 				.collect(Collectors.toList()));
 		
 		assertEquals(2, service.getDatas().size());
@@ -44,7 +44,7 @@ class TopGainerlooserServiceTest {
 	public void getDataByIdTest() {
 		
 		when(repository.getData(1))
-		.thenReturn( new TopGainerLooser(1,"ABC","Stock1",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available"));
+		.thenReturn( new TopGainerLooser(1,"ABC","Stock1","date", (float) 12.0, (float) 250.0,"INR","Available"));
 		
 		TopGainerLooser topGainerLooser = repository.getData(1);
 		
@@ -53,7 +53,7 @@ class TopGainerlooserServiceTest {
 	
 	@Test
 	public void saveDataTest() {
-		TopGainerLooser topGainerLooser = new TopGainerLooser(1,"ABC","Stock1",date,(float) 0.54, (float) 12.0, (float) 250.0,"INR","Available");
+		TopGainerLooser topGainerLooser = new TopGainerLooser(1,"ABC","Stock1","date", (float) 12.0, (float) 250.0,"INR","Available");
 		service.createOrUpdateData(topGainerLooser);
 		verify(repository,times(1)).createOrUpdateData(topGainerLooser);
 		
