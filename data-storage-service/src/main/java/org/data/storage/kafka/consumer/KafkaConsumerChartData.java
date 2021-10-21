@@ -1,8 +1,5 @@
 package org.data.storage.kafka.consumer;
 
-import java.util.List;
-
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.data.storage.model.ChartData;
 import org.data.storage.service.ChartDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +16,8 @@ public class KafkaConsumerChartData {
 	@Autowired
 	private ChartDataService chartDataService;
 	
-	@KafkaListener(topics = "chart-data", groupId= "chart-data-consumer-grp" )
-	public void consumeMessage(List<ConsumerRecord<String, ChartData>> records) {
-		records.stream().forEach(x->{
-			ChartData chartData = x.value();
+	@KafkaListener(topics = "chart-data", groupId= "chart-data-consumer", containerFactory = "kafkaListenerContainerFactoryChartData" )
+	public void consumeMessage(ChartData chartData) {
 			chartDataService.createOrUpdateChartData(chartData);
-		});
 	}
 }
