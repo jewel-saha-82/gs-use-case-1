@@ -46,13 +46,21 @@ public class KafkaConsumerConfiguration {
     
     @Bean
     public ConsumerFactory<String, ChartData> rawChartDataConsumerFactory() {
+    	JsonDeserializer<ChartData> deserializer = new JsonDeserializer<>(ChartData.class);
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+
         Map<String, Object> config = new HashMap<>();
+
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
-                new JsonDeserializer<>(ChartData.class));
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
     }
 
     @Bean

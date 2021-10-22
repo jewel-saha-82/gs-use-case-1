@@ -17,35 +17,23 @@ public class ChartData {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id")
 	private int id;
 	
 	@Column(name="symbol")
 	private String symbol;
 	
-	@Column(name="stock_name")
-	private String stock_name;
+	@Column(name="stockName")
+	private String stockName;
 	
 	@Column(name="date")
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate date;
 	
-	@Column(name="closing_price")
-	private float closing_price;
+	@Column(name="closingPrice")
+	private float closingPrice;
 	
 	@Column(name="currency")
 	private String currency;
-		
-	public ChartData() {}
-
-	public ChartData(int id, String symbol, String stock_name, LocalDate date, float closing_price, String currency) {
-		this.id = id;
-		this.symbol = symbol;
-		this.stock_name = stock_name;
-		this.date = date;
-		this.closing_price = closing_price;
-		this.currency = currency;
-	}
 
 	public int getId() {
 		return id;
@@ -63,12 +51,12 @@ public class ChartData {
 		this.symbol = symbol;
 	}
 
-	public String getStock_name() {
-		return stock_name;
+	public String getStockName() {
+		return stockName;
 	}
 
-	public void setStock_name(String stock_name) {
-		this.stock_name = stock_name;
+	public void setStockName(String stockName) {
+		this.stockName = stockName;
 	}
 
 	public LocalDate getDate() {
@@ -79,12 +67,12 @@ public class ChartData {
 		this.date = date;
 	}
 
-	public float getClosing_price() {
-		return closing_price;
+	public float getClosingPrice() {
+		return closingPrice;
 	}
 
-	public void setClosing_price(float closing_price) {
-		this.closing_price = closing_price;
+	public void setClosingPrice(float closingPrice) {
+		this.closingPrice = closingPrice;
 	}
 
 	public String getCurrency() {
@@ -97,10 +85,23 @@ public class ChartData {
 
 	@Override
 	public String toString() {
-		return "ChartData [id=" + id + ", symbol=" + symbol + ", stock_name=" + stock_name + ", date=" + date
-				+ ", closing_price=" + closing_price + ", currency=" + currency + ", created_by="
-				+ "]";
+		return "ChartData [id=" + id + ", symbol=" + symbol + ", stockName=" + stockName + ", date=" + date
+				+ ", closingPrice=" + closingPrice + ", currency=" + currency + "]";
 	}
+
+	public ChartData(int id, String symbol, String stockName, LocalDate date, float closingPrice, String currency) {
+		this.id = id;
+		this.symbol = symbol;
+		this.stockName = stockName;
+		this.date = date;
+		this.closingPrice = closingPrice;
+		this.currency = currency;
+	}
+
+	public ChartData() {
+	}
+		
+	
 	
 	
 	
