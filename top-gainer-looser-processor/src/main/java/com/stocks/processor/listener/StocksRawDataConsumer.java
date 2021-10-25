@@ -16,7 +16,7 @@ public class StocksRawDataConsumer {
     @Autowired
     TopGainerLooserServiceImpl topGainerLooserService;
 
-    @KafkaListener(topics = "script-raw-data", group = "raw-data-consumer", containerFactory = "kafkaListenerContainerFactory")
+   @KafkaListener(topics = "script-raw-data", group = "raw-data-consumer", containerFactory = "kafkaListenerContainerFactory")
     public void stocksRawDataListener(RootModel rootModel) {
         topGainerLooserService.collectStocksDetails(rootModel);
         logger.info("TGTL = {}", rootModel);

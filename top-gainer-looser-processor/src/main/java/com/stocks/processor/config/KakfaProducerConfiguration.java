@@ -2,8 +2,10 @@ package com.stocks.processor.config;
 
 import com.stocks.processor.model.RootModel;
 import com.stocks.processor.model.TopGainerLooserData;
+import com.stocks.processor.properties.AppProperties;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,14 +21,14 @@ import java.util.Map;
 public class KakfaProducerConfiguration {
 
 
-    @Value("${kafka.bootstrap-server}")
-    private String bootstrapServer;
+    @Autowired
+    AppProperties properties;
 
     @Bean
     public ProducerFactory<String, RootModel> producerFactory() {
         Map<String, Object> config = new HashMap<>();
 
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServer());
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
@@ -37,7 +39,7 @@ public class KakfaProducerConfiguration {
     public ProducerFactory<Object, TopGainerLooserData> producerFactory2() {
         Map<String, Object> config = new HashMap<>();
 
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServer());
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
