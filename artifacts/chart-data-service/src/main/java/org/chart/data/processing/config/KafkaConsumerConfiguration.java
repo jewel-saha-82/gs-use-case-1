@@ -23,6 +23,12 @@ public class KafkaConsumerConfiguration {
 	@Value("${kafka.groupId}")
 	private String groupId;
 
+	@Value("${kafka.consumer.batch.size}")
+	private int batchSize;
+
+	@Value("${auto.offset.report.config}")
+	private String offsetConfig;
+
 	@Bean
 	public ConsumerFactory<String, RootModel> rawDataConsumerFactory() {
 
@@ -35,11 +41,11 @@ public class KafkaConsumerConfiguration {
 
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
 		config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-		config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+		config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetConfig);
 		config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
-		config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 200);
+		config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, batchSize);
 
 		return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
 	}
