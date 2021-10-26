@@ -35,7 +35,7 @@ public class ApiServiceProducer {
         rootModel.getValues().forEach(valuesModel -> {
             kafkaRootModel.setValue(valuesModel);
             logger.info(kafkaRootModel.toString());
-            kafkaTemplate.send(producerProperties.TOPIC, kafkaRootModel);
+            kafkaTemplate.send(producerProperties.getTOPIC(), kafkaRootModel);
         });
     }
 }
