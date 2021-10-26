@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.concurrent.ListenableFuture;
 
 
 @Component
@@ -26,11 +27,15 @@ public class ApiServiceProducer {
         KafkaRootModel kafkaRootModel = new KafkaRootModel();
         kafkaRootModel.setMeta(rootModel.getMeta());
         kafkaRootModel.setStatus(rootModel.getStatus());
-        for (ValuesModel valuesModel : rootModel.getValues()) {
+        extracted(rootModel, kafkaRootModel);
+        return "Produced Successfully";
+    }
+
+    private void extracted(RootModel rootModel, KafkaRootModel kafkaRootModel) {
+        rootModel.getValues().forEach(valuesModel -> {
             kafkaRootModel.setValue(valuesModel);
             logger.info(kafkaRootModel.toString());
             kafkaTemplate.send(producerProperties.TOPIC, kafkaRootModel);
-        }
-        return "Produced Successfully";
+        });
     }
 }
