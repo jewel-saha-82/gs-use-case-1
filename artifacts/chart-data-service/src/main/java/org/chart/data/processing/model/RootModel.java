@@ -1,6 +1,5 @@
 package org.chart.data.processing.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RootModel {
 
-    private MetaModel meta;
+	private MetaModel meta;
 
-    private ValuesModel value;
+	private ValuesModel value;
 
-    private String status;
+	private String status;
 
 }

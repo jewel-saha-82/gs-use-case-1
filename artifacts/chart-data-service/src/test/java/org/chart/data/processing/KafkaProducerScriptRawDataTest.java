@@ -2,6 +2,9 @@ package org.chart.data.processing;
 
 import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.chart.data.processing.kafka.producer.KafkaProducerScriptRawData;
 import org.chart.data.processing.model.MetaModel;
 import org.chart.data.processing.model.RootModel;
@@ -26,11 +29,20 @@ public class KafkaProducerScriptRawDataTest {
 		MetaModel metaModel = new MetaModel("AAPL", "1day", "USD", "America/New_York", "NASDAQ", "Common Stock");
 		ValuesModel valuesModel = new ValuesModel("2021-10-11", "142.27000", "144.81000", "141.81000", "142.81000",
 				"63012662");
-		RootModel KafkaRootModel = new RootModel(metaModel, valuesModel, "ok");
+		RootModel rootModel = new RootModel(metaModel, valuesModel, "ok");
+
+		ObjectMapper mapper = new ObjectMapper();
 
 		// when
-		//for (int i = 0; i < 100; i++)
-			//kafkaProducer.sendMessage(KafkaRootModel);
+		for (int i = 0; i < 100; i++) {
+			String json = null;
+			try {
+				json = mapper.writeValueAsString(rootModel);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+			kafkaProducer.sendMessage(json);
+		}
 
 		// then
 	}

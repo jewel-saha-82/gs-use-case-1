@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class ChartData {
 	private String symbol;
 	private String stockName;
-	private LocalDate date;
+	private String date;
 	private BigDecimal closingPrice;
 	private String currency;
 }

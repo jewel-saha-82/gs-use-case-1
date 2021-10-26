@@ -2,6 +2,9 @@ package org.chart.data.processing.kafka.producer;
 
 import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.chart.data.processing.model.ChartData;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,27 +27,32 @@ public class KafkaProducerChartData {
 	private String topic;
 
 	@Autowired
-	private KafkaTemplate<String, ChartData> kafkaTemplate2;
+	private KafkaTemplate<String, String> kafkaTemplate;
 
-	public void sendMessage(final ChartData chartData) throws InterruptedException, ExecutionException {
+	public void sendMessage(final String message) throws InterruptedException, ExecutionException {
 
-		ListenableFuture<SendResult<String, ChartData>> future = kafkaTemplate2.send(topic, chartData);
+		ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);
 
-		future.addCallback(new ListenableFutureCallback<SendResult<String, ChartData>>() {
+		future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
 
-			private SendResult<String, ChartData> message;
+			private ChartData chartData;
 
 			@Override
-			public void onSuccess(final SendResult<String, ChartData> message) {
-				this.message = message;
-				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
-				// logger.info("Chart data producer thread = {}", Thread.currentThread());
+			public void onSuccess(final SendResult<String, String> record) {
+				ObjectMapper mapper = new ObjectMapper();
+				ChartData chartData = null;
+				try {
+					chartData = mapper.readValue(record.getProducerRecord().value(), ChartData.class);
+				} catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
+				this.chartData = chartData;
+				logger.info("sent message = {}, with offset = {}", chartData, record.getRecordMetadata().offset());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
-				logger.error("unable to send message = " + message, throwable);
-				// logger.info("Chart data producer thread = {}", Thread.currentThread());
+				logger.error("unable to send message = {}", chartData, throwable);
 			}
 		});
 

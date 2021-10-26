@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.chart.data.processing.kafka.producer.KafkaProducerChartData;
 import org.chart.data.processing.model.ChartData;
 import org.junit.jupiter.api.DisplayName;
@@ -23,11 +26,16 @@ public class KafkaProducerChartDataTest {
 	void producerTest() throws InterruptedException, ExecutionException {
 
 		// given
-		ChartData chartData = new ChartData("AAPL", "Apple Inc.", LocalDate.now(), new BigDecimal("120.22"), "USD");
+		ChartData chartData = new ChartData("AAPL", "Apple Inc.", "2021-10-21", new BigDecimal("120.22"), "USD");
 
-		// when
-		//kafkaProducer.sendMessage(chartData);
+		ObjectMapper mapper = new ObjectMapper();
 
-		// then
+		String json = null;
+		try {
+			json = mapper.writeValueAsString(chartData);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		kafkaProducer.sendMessage(json);
 	}
 }

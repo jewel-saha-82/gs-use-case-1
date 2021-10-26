@@ -2,6 +2,9 @@ package org.chart.data.processing.kafka.producer;
 
 import java.util.concurrent.ExecutionException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.chart.data.processing.model.RootModel;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,27 +27,32 @@ public class KafkaProducerScriptRawData {
 	private String topic;
 
 	@Autowired
-	private KafkaTemplate<String, RootModel> kafkaTemplate;
+	private KafkaTemplate<String, String> kafkaTemplate;
 
-	public void sendMessage(final RootModel KafkaRootModel) throws InterruptedException, ExecutionException {
+	public void sendMessage(final String message) throws InterruptedException, ExecutionException {
 
-		ListenableFuture<SendResult<String, RootModel>> future = kafkaTemplate.send(topic, KafkaRootModel);
+		ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);
 
-		future.addCallback(new ListenableFutureCallback<SendResult<String, RootModel>>() {
+		future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
 
-			private SendResult<String, RootModel> message;
+			private RootModel rootModel;
 
 			@Override
-			public void onSuccess(final SendResult<String, RootModel> message) {
-				this.message = message;
-				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
-				// logger.info("Raw data producer thread = {}", Thread.currentThread());
+			public void onSuccess(final SendResult<String, String> record) {
+				ObjectMapper mapper = new ObjectMapper();
+				RootModel rootModel = null;
+				try {
+					rootModel = mapper.readValue(record.getProducerRecord().value(), RootModel.class);
+				} catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
+				this.rootModel = rootModel;
+				logger.info("sent message = {}, with offset = {}", rootModel, record.getRecordMetadata().offset());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
-				logger.error("unable to send message = " + message, throwable);
-				// logger.info("Raw data producer thread = {}", Thread.currentThread());
+				logger.error("unable to send message = {}", rootModel, throwable);
 			}
 		});
 	}
