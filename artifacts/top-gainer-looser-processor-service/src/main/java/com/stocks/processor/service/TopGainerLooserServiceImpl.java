@@ -47,7 +47,20 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
         }
 
         TopGainerLooserData topGainerData = new TopGainerLooserData();
-        try{
+            producer.produceTopGainerLooser(getTopGainer());
+            producer.produceTopGainerLooser(getTopLooser());
+
+        clearStocksData();
+        return topGainerData;
+    }
+
+    /**
+     * get to gainer stock details
+     * @return
+     */
+    private TopGainerLooserData getTopGainer(){
+        try {
+            TopGainerLooserData topGainerData = new TopGainerLooserData();
             ValuesModel maxValue = inMemoryData.getStocksData().stream().
                     max(Comparator.comparing(ValuesModel::getClose))
                     .get();
@@ -60,9 +73,18 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
             topGainerData.setClosing_price(maxValue.getClose());
             topGainerData.setCurrency(inMemoryData.getMetaModel().getCurrency());
             topGainerData.setStatus(Constants.GAINER);
-            producer.produceTopGainerLooser(topGainerData);
+            return topGainerData;
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 
-
+    /**
+     * get top looser stock details
+     * @return
+     */
+    private TopGainerLooserData getTopLooser(){
+        try {
             ValuesModel minValue = inMemoryData.getStocksData().stream().
                     min(Comparator.comparing(ValuesModel::getClose))
                     .get();
@@ -75,16 +97,12 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
             topLooserData.setClosing_price(minValue.getClose());
             topLooserData.setCurrency(inMemoryData.getMetaModel().getCurrency());
             topLooserData.setStatus(Constants.LOOSER);
-
-            producer.produceTopGainerLooser(topLooserData);
-        }catch (Exception ex){
-            // throw any business exception
+            return topLooserData;
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
         }
-
-
-        clearStocksData();
-        return topGainerData;
     }
+
 
     /**
      * clear data from stocks values list
