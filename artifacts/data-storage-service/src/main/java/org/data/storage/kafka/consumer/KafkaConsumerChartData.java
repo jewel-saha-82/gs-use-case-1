@@ -1,5 +1,7 @@
 package org.data.storage.kafka.consumer;
 
+import java.util.List;
+
 import org.data.storage.model.ChartData;
 import org.data.storage.service.ChartDataService;
 import org.slf4j.Logger;
@@ -20,8 +22,8 @@ public class KafkaConsumerChartData {
 	private ChartDataService chartDataService;
 	
 	@KafkaListener(topics = "chart-data", groupId= "chart-data-consumer1", containerFactory = "kafkaListenerContainerFactoryChartData" )
-	public void consumeMessage(ChartData chartData) {
-		logger.info(chartData.toString());
-		chartDataService.createOrUpdateChartData(chartData);
+	public void consumeMessage(List<ChartData> chartDataList) {
+		logger.info("Kafka batch dataSize = "+chartDataList.size());
+		chartDataService.insertUsingBatch(chartDataList);
 	}
 }

@@ -7,7 +7,8 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.data.storage.model.ChartData;
 import org.data.storage.model.TopGainerLooser;
-import org.springframework.beans.factory.annotation.Value;
+import org.data.storage.properties.AppProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -20,19 +21,22 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 @Configuration
 public class KafkaConsumerConfiguration {
 
-    @Value("${spring.kafka.consumer.bootstrap-servers}")
-    private String bootstrapServer;
-
-    @Value("${spring.kafka.consumer.group-id}")
-    private String groupId;;
+	@Autowired
+	AppProperties appProperties;
 
     @Bean
     public ConsumerFactory<String, TopGainerLooser> rawDataConsumerFactory() {
+    	JsonDeserializer<TopGainerLooser> deserializer = new JsonDeserializer<>(TopGainerLooser.class);
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+
         Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, appProperties.getBootstrapServer());
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, appProperties.getGroupId());
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
+        
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
                 new JsonDeserializer<>(TopGainerLooser.class));
     }
@@ -53,12 +57,12 @@ public class KafkaConsumerConfiguration {
 
         Map<String, Object> config = new HashMap<>();
 
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, appProperties.getBootstrapServer());
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, appProperties.getGroupId());
         config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
+        config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, appProperties.getBATCH_SIZE());
 
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
     }
@@ -67,6 +71,7 @@ public class KafkaConsumerConfiguration {
     public ConcurrentKafkaListenerContainerFactory<String, ChartData> kafkaListenerContainerFactoryChartData() {
         ConcurrentKafkaListenerContainerFactory<String, ChartData> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(rawChartDataConsumerFactory());
+        factory.setBatchListener(true);
         return factory;
     }
 
