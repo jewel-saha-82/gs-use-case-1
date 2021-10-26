@@ -2,6 +2,9 @@ package org.api.service.resource;
 
 import java.util.Arrays;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.api.service.model.KafkaRootModel;
 import org.api.service.model.RootModel;
 import org.api.service.model.ValuesModel;
@@ -32,14 +35,14 @@ public class TwelveDataController {
 	private String topic;
 
 	@Autowired
-	private KafkaTemplate<String, KafkaRootModel> kafkaTemplate;
+	private KafkaTemplate<String, String> kafkaTemplate;
 
 	@GetMapping(value = "api.twelvedata.com/stocks", produces = MediaType.TEXT_PLAIN_VALUE)
 	public String getData() {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		//headers.add("user-agent", browser);
+		headers.add("user-agent", browser);
 		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
 		ResponseEntity<RootModel> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, RootModel.class);
@@ -56,7 +59,17 @@ public class TwelveDataController {
 		for (ValuesModel valuesModel : rootModel.getValues()) {
 			kafkaRootModel.setValue(valuesModel);
 			logger.info("output of kafka producer: ", kafkaRootModel);
-			kafkaTemplate.send(topic, kafkaRootModel);
+
+			ObjectMapper mapper = new ObjectMapper();
+			String json = null;
+			try {
+				json = mapper.writeValueAsString(kafkaRootModel);
+				System.out.println(json);
+			} catch (JsonProcessingException e1) {
+				e1.printStackTrace();
+			}
+
+			kafkaTemplate.send(topic, json);
 		}
 	}
 
