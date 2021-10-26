@@ -26,7 +26,7 @@ public class KafkaProducerChartDataTest {
 		ChartData chartData = new ChartData("AAPL", "Apple Inc.", LocalDate.now(), new BigDecimal("120.22"), "USD");
 
 		// when
-		kafkaProducer.sendMessage(chartData);
+		//kafkaProducer.sendMessage(chartData);
 
 		// then
 	}
