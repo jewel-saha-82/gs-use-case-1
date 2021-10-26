@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.data.storage.exception.DataNotFoundException;
-import org.data.storage.model.ChartData;
 import org.data.storage.model.TopGainerLooser;
-import org.data.storage.service.ChartDataService;
 import org.data.storage.service.TopGainerLooserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

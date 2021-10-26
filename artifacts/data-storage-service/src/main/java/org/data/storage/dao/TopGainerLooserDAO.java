@@ -3,6 +3,7 @@ package org.data.storage.dao;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
@@ -46,9 +47,14 @@ public class TopGainerLooserDAO {
 		return data;
 	}
 	
-	public void deleteData(int id) {
+	public int deleteData(int id) {
 		Session session = sessionFactory.getCurrentSession();
-		session.createQuery("delete from TopGainerLooser where id=:id").setParameter("id", id).executeUpdate();
+		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+		CriteriaDelete<TopGainerLooser> criteriaDelete = criteriaBuilder.createCriteriaDelete(TopGainerLooser.class);
+		Root<TopGainerLooser> root = criteriaDelete.from(TopGainerLooser.class);
+		criteriaDelete.where(criteriaBuilder.equal(root.get("id"), id));
+		return session.createQuery(criteriaDelete).executeUpdate();
+		//session.createQuery("delete from TopGainerLooser where id=:id").setParameter("id", id).executeUpdate();
 	}
 
 }
