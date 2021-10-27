@@ -1,11 +1,13 @@
 package org.chart.data.processing;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.Producer;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,6 +44,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 class KafkaConsumerTest {
 
 	private Producer<String, String> producer;
+
+	private RootModel rm;
 
 	@Autowired
 	private EmbeddedKafkaBroker embeddedKafkaBroker;
@@ -62,6 +67,10 @@ class KafkaConsumerTest {
 		Map<String, Object> configs = new HashMap<>(KafkaTestUtils.producerProps(embeddedKafkaBroker));
 		producer = new DefaultKafkaProducerFactory<>(configs, new StringSerializer(), new StringSerializer())
 				.createProducer();
+		// Models
+		MetaModel mm = new MetaModel("AAPL", "1day", "USD", "America/New_York", "NASDAQ", "Common Stock");
+		ValuesModel vm = new ValuesModel("2021-10-11", "142.27000", "144.81000", "141.81000", "142.81000", "63012662");
+		rm = new RootModel(mm, vm, "ok");
 	}
 
 	@AfterAll
@@ -71,11 +80,6 @@ class KafkaConsumerTest {
 
 	@Test
 	void testLogKafkaMessages() throws JsonProcessingException {
-
-		String symbol = "AAPL";
-		MetaModel mm = new MetaModel(symbol, "1day", "USD", "America/New_York", "NASDAQ", "Common Stock");
-		ValuesModel vm = new ValuesModel("2021-10-11", "142.27000", "144.81000", "141.81000", "142.81000", "63012662");
-		RootModel rm = new RootModel(mm, vm, "ok");
 
 		// Write a message to Kafka using a test producer
 		String jsonMsg = objectMapper.writeValueAsString(rm);
@@ -87,6 +91,25 @@ class KafkaConsumerTest {
 
 		RootModel rm1 = objectMapper.readValue(argumentCaptor.getValue().get(0).value(), RootModel.class);
 		BDDAssertions.then(rm1).isNotNull();
-		BDDAssertions.then(rm1.getMeta().getSymbol()).isEqualTo(symbol);
+		BDDAssertions.then(rm1.getMeta().getSymbol()).isEqualTo("AAPL");
+	}
+
+	@Test
+	void sendMsgToPrdcr_exception_test() throws JsonProcessingException, InterruptedException, ExecutionException {
+
+		// Write a message to Kafka using a test producer
+		String jsonMsg = objectMapper.writeValueAsString(rm);
+		producer.send(new ProducerRecord<>(consumer.getTopic(), jsonMsg));
+		producer.flush();
+
+		//Exception test
+		doThrow(new InterruptedException()).when(kafkaProducerChartData).sendMessage(Mockito.anyString());
+
+		// Read the message and assert its properties
+		verify(consumer, timeout(5000).times(1)).consumeMessage(argumentCaptor.capture());
+
+		RootModel rm1 = objectMapper.readValue(argumentCaptor.getValue().get(0).value(), RootModel.class);
+		BDDAssertions.then(rm1).isNotNull();
+		BDDAssertions.then(rm1.getMeta().getSymbol()).isEqualTo("AAPL");
 	}
 }
