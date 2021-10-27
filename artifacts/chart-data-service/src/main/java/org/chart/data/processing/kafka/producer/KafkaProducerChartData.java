@@ -53,7 +53,7 @@ public class KafkaProducerChartData {
 
 	}
 
-	private ChartData jsonToChartData(final SendResult<String, String> record) {
+	public ChartData jsonToChartData(final SendResult<String, String> record) {
 		try {
 			return objectMapper.readValue(record.getProducerRecord().value(), ChartData.class);
 		} catch (JsonProcessingException e) {

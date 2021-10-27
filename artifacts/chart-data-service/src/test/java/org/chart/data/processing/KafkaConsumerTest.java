@@ -49,7 +49,7 @@ class KafkaConsumerTest {
 	private ObjectMapper objectMapper;
 
 	@SpyBean
-	private KafkaConsumerScriptRawData crd;
+	private KafkaConsumerScriptRawData consumer;
 
 	@Captor
 	ArgumentCaptor<List<ConsumerRecord<String, String>>> argumentCaptor;
@@ -77,15 +77,15 @@ class KafkaConsumerTest {
 		ValuesModel vm = new ValuesModel("2021-10-11", "142.27000", "144.81000", "141.81000", "142.81000", "63012662");
 		RootModel rm = new RootModel(mm, vm, "ok");
 
-		// Write a message (John Wick user) to Kafka using a test producer
+		// Write a message to Kafka using a test producer
 		String jsonMsg = objectMapper.writeValueAsString(rm);
-		producer.send(new ProducerRecord<>(crd.getTopic(), jsonMsg));
+		producer.send(new ProducerRecord<>(consumer.getTopic(), jsonMsg));
 		producer.flush();
 
 		// Read the message and assert its properties
-		verify(crd, timeout(5000).times(1)).consumeMessage(argumentCaptor.capture());
+		verify(consumer, timeout(5000).times(1)).consumeMessage(argumentCaptor.capture());
 
-		RootModel rm1 = crd.jsonToRootModel(argumentCaptor.getValue().get(0));
+		RootModel rm1 = consumer.jsonToRootModel(argumentCaptor.getValue().get(0));
 		BDDAssertions.then(rm1).isNotNull();
 		BDDAssertions.then(rm1.getMeta().getSymbol()).isEqualTo(symbol);
 	}

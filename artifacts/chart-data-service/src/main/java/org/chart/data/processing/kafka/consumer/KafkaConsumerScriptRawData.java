@@ -50,7 +50,7 @@ public class KafkaConsumerScriptRawData {
 				.currency(rm.getMeta().getCurrency()).build();
 	}
 
-	private String chartDataToJson(ChartData chartData) {
+	public String chartDataToJson(ChartData chartData) {
 		String json = null;
 		try {
 			json = objectMapper.writeValueAsString(chartData);
