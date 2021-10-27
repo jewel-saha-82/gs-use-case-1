@@ -12,42 +12,54 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class KafkaProducerChartData {
 
-	Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
-
+	private Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 	@Value("${kafka.topic.chart-data}")
 	private String topic;
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@Autowired
-	private KafkaTemplate<String, ChartData> kafkaTemplate2;
+	private KafkaTemplate<String, String> kafkaTemplate;
 
-	public void sendMessage(final ChartData chartData) throws InterruptedException, ExecutionException {
+	public void sendMessage(final String message) throws InterruptedException, ExecutionException {
 
-		ListenableFuture<SendResult<String, ChartData>> future = kafkaTemplate2.send(topic, chartData);
+		ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);
 
-		future.addCallback(new ListenableFutureCallback<SendResult<String, ChartData>>() {
+		future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
 
-			private SendResult<String, ChartData> message;
+			private ChartData chartData;
 
 			@Override
-			public void onSuccess(final SendResult<String, ChartData> message) {
-				this.message = message;
-				logger.info("sent message = " + message + ", with offset= " + message.getRecordMetadata().offset());
-				// logger.info("Chart data producer thread = {}", Thread.currentThread());
+			public void onSuccess(final SendResult<String, String> record) {
+				ChartData chartData = jsonToChartData(record.getProducerRecord().value());
+				this.chartData = chartData;
+				logger.info("sent message = {}, with offset = {}", chartData, record.getRecordMetadata().offset());
 			}
 
 			@Override
 			public void onFailure(final Throwable throwable) {
-				logger.error("unable to send message = " + message, throwable);
-				// logger.info("Chart data producer thread = {}", Thread.currentThread());
+				logger.error("unable to send message = {}", chartData, throwable);
 			}
 		});
 
+	}
+
+	public ChartData jsonToChartData(final String json) {
+		try {
+			return objectMapper.readValue(json, ChartData.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 }

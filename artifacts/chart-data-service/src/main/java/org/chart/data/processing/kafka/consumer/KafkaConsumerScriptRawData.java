@@ -1,8 +1,6 @@
 package org.chart.data.processing.kafka.consumer;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -15,43 +13,62 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class KafkaConsumerScriptRawData {
 
-	Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
-
+	private Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 	private final String topic = "script-raw-data";
-
 	@Autowired
 	private KafkaProducerChartData kafkaProducerChartData;
+	@Autowired
+	private ObjectMapper objectMapper;
 
-	@KafkaListener(topics = topic, groupId = "script-raw-consumer-grp", containerFactory = "kafkaListenerContainerFactory")
-	public void consumeMessage(List<ConsumerRecord<String, RootModel>> records) {
+	@KafkaListener(topics = topic, groupId = "script-raw-consumer-grp")
+	public void consumeMessage(List<ConsumerRecord<String, String>> records) {
+		records.stream().forEach(x -> sendMsgToPrdcr(chartDataToJson(createChartData(jsonToRootModel(x.value())))));
+	}
 
-		// logger.info("Consumer thread = {}", Thread.currentThread());
+	public RootModel jsonToRootModel(String json) {
+		logger.info(json);
+		try {
+			return objectMapper.readValue(json, RootModel.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-		records.stream().forEach(x -> {
+	private ChartData createChartData(RootModel rm) {
+		return ChartData.builder().symbol(rm.getMeta().getSymbol()).stockName(rm.getMeta().getSymbol())
+				.date(rm.getValue().getDatetime()).closingPrice(new BigDecimal(rm.getValue().getClose()))
+				.currency(rm.getMeta().getCurrency()).build();
+	}
 
-			RootModel KafkaRootModel = x.value();
+	public String chartDataToJson(ChartData chartData) {
+		String json = null;
+		try {
+			json = objectMapper.writeValueAsString(chartData);
+		} catch (JsonProcessingException e1) {
+			e1.printStackTrace();
+		}
+		return json;
+	}
 
-			System.out.println("Consumed message: " + KafkaRootModel);
+	private void sendMsgToPrdcr(String json) {
+		try {
+			kafkaProducerChartData.sendMessage(json);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
 
-			ChartData chartData = ChartData.builder().symbol(KafkaRootModel.getMeta().getSymbol())
-					.stockName(KafkaRootModel.getMeta().getSymbol())
-					.date(LocalDate.parse(KafkaRootModel.getValue().getDatetime(),
-							DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-					.closingPrice(new BigDecimal(KafkaRootModel.getValue().getClose()))
-					.currency(KafkaRootModel.getMeta().getCurrency()).build();
-
-			try {
-				kafkaProducerChartData.sendMessage(chartData);
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-			}
-
-		});
+	public String getTopic() {
+		return this.topic;
 	}
 }
