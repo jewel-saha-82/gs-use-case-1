@@ -31,13 +31,13 @@ public class KafkaConsumerScriptRawData {
 
 	@KafkaListener(topics = topic, groupId = "script-raw-consumer-grp")
 	public void consumeMessage(List<ConsumerRecord<String, String>> records) {
-		records.stream().forEach(x -> sendMsgToPrdcr(chartDataToJson(createChartData(jsonToRootModel(x)))));
+		records.stream().forEach(x -> sendMsgToPrdcr(chartDataToJson(createChartData(jsonToRootModel(x.value())))));
 	}
 
-	public RootModel jsonToRootModel(ConsumerRecord<String, String> x) {
-		logger.info(x.value());
+	public RootModel jsonToRootModel(String json) {
+		logger.info(json);
 		try {
-			return objectMapper.readValue(x.value(), RootModel.class);
+			return objectMapper.readValue(json, RootModel.class);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			return null;
@@ -67,7 +67,7 @@ public class KafkaConsumerScriptRawData {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getTopic() {
 		return this.topic;
 	}

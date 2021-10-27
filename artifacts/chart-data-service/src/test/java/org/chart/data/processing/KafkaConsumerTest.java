@@ -85,7 +85,7 @@ class KafkaConsumerTest {
 		// Read the message and assert its properties
 		verify(consumer, timeout(5000).times(1)).consumeMessage(argumentCaptor.capture());
 
-		RootModel rm1 = consumer.jsonToRootModel(argumentCaptor.getValue().get(0));
+		RootModel rm1 = objectMapper.readValue(argumentCaptor.getValue().get(0).value(), RootModel.class);
 		BDDAssertions.then(rm1).isNotNull();
 		BDDAssertions.then(rm1.getMeta().getSymbol()).isEqualTo(symbol);
 	}

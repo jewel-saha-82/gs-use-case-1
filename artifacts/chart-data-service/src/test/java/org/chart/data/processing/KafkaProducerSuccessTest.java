@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @EmbeddedKafka
 @SpringBootTest(properties = "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class KafkaProducerTest {
+class KafkaProducerSuccessTest {
 
 	private BlockingQueue<ConsumerRecord<String, String>> records;
 
@@ -80,39 +80,20 @@ class KafkaProducerTest {
 	}
 
 	@Test
-	void testWriteToKafka() throws InterruptedException, JsonProcessingException, ExecutionException {
+	void testWriteToKafka_Success() throws InterruptedException, JsonProcessingException, ExecutionException {
 		// Create a Model and write to Kafka
 		String symbol = "AAPL";
 		ChartData chartData = new ChartData(symbol, "Apple Inc.", "2021-10-27", new BigDecimal("120.22"), "USD");
 
-		producer.sendMessage(chartDataToJson(chartData));
+		producer.sendMessage(objectMapper.writeValueAsString(chartData));
 
 		// Read the message with a test consumer from Kafka and assert
 		// its properties
 		ConsumerRecord<String, String> message = records.poll(500, TimeUnit.MILLISECONDS);
 
-		BDDAssertions.then(message).isNotNull();
-		ChartData result = jsonToChartData(message);
+		BDDAssertions.then(message.value()).isNotNull();
+		ChartData result = objectMapper.readValue(message.value(), ChartData.class);
 		BDDAssertions.then(result).isNotNull();
 		BDDAssertions.then(result.getSymbol()).isEqualTo(symbol);
-	}
-
-	public ChartData jsonToChartData(ConsumerRecord<String, String> x) {
-		try {
-			return objectMapper.readValue(x.value(), ChartData.class);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	public String chartDataToJson(ChartData chartData) {
-		String json = null;
-		try {
-			json = objectMapper.writeValueAsString(chartData);
-		} catch (JsonProcessingException e1) {
-			e1.printStackTrace();
-		}
-		return json;
 	}
 }

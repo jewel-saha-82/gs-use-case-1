@@ -40,7 +40,7 @@ public class KafkaProducerChartData {
 
 			@Override
 			public void onSuccess(final SendResult<String, String> record) {
-				ChartData chartData = jsonToChartData(record);
+				ChartData chartData = jsonToChartData(record.getProducerRecord().value());
 				this.chartData = chartData;
 				logger.info("sent message = {}, with offset = {}", chartData, record.getRecordMetadata().offset());
 			}
@@ -53,9 +53,9 @@ public class KafkaProducerChartData {
 
 	}
 
-	public ChartData jsonToChartData(final SendResult<String, String> record) {
+	public ChartData jsonToChartData(final String json) {
 		try {
-			return objectMapper.readValue(record.getProducerRecord().value(), ChartData.class);
+			return objectMapper.readValue(json, ChartData.class);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			return null;
