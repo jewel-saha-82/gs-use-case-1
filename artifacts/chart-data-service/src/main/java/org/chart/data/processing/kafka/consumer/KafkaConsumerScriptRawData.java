@@ -22,47 +22,49 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KafkaConsumerScriptRawData {
 
-	Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
-
+	private Logger logger = org.slf4j.LoggerFactory.getLogger(getClass());
 	private final String topic = "script-raw-data";
-
 	@Autowired
 	private KafkaProducerChartData kafkaProducerChartData;
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@KafkaListener(topics = topic, groupId = "script-raw-consumer-grp")
 	public void consumeMessage(List<ConsumerRecord<String, String>> records) {
+		records.stream().forEach(x -> sendMsgToPrdcr(chartDataToJson(createChartData(jsonToRootModel(x)))));
+	}
 
-		records.stream().forEach(x -> {
+	private RootModel jsonToRootModel(ConsumerRecord<String, String> x) {
+		logger.info(x.value());
+		try {
+			return objectMapper.readValue(x.value(), RootModel.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-			System.out.println(x.value());
-			ObjectMapper mapper = new ObjectMapper();
-			RootModel rootModel = null;
-			try {
-				rootModel = mapper.readValue(x.value(), RootModel.class);
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
+	private ChartData createChartData(RootModel rm) {
+		return ChartData.builder().symbol(rm.getMeta().getSymbol()).stockName(rm.getMeta().getSymbol())
+				.date(rm.getValue().getDatetime()).closingPrice(new BigDecimal(rm.getValue().getClose()))
+				.currency(rm.getMeta().getCurrency()).build();
+	}
 
-			System.out.println("Consumed message: " + rootModel);
+	private String chartDataToJson(ChartData chartData) {
+		String json = null;
+		try {
+			json = objectMapper.writeValueAsString(chartData);
+		} catch (JsonProcessingException e1) {
+			e1.printStackTrace();
+		}
+		return json;
+	}
 
-			ChartData chartData = ChartData.builder().symbol(rootModel.getMeta().getSymbol())
-					.stockName(rootModel.getMeta().getSymbol()).date(rootModel.getValue().getDatetime())
-					.closingPrice(new BigDecimal(rootModel.getValue().getClose()))
-					.currency(rootModel.getMeta().getCurrency()).build();
-
-			String json = null;
-			try {
-				json = mapper.writeValueAsString(chartData);
-			} catch (JsonProcessingException e1) {
-				e1.printStackTrace();
-			}
-
-			try {
-				kafkaProducerChartData.sendMessage(json);
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
-			}
-
-		});
+	private void sendMsgToPrdcr(String json) {
+		try {
+			kafkaProducerChartData.sendMessage(json);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 }
