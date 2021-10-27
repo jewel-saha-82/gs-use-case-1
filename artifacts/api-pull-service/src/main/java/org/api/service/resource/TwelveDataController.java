@@ -42,7 +42,7 @@ public class TwelveDataController {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		headers.add("user-agent", browser);
+		//headers.add("user-agent", browser);
 		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
 		ResponseEntity<RootModel> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, entity, RootModel.class);
