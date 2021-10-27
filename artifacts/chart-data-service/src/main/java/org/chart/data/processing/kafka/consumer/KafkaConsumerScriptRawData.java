@@ -34,7 +34,7 @@ public class KafkaConsumerScriptRawData {
 		records.stream().forEach(x -> sendMsgToPrdcr(chartDataToJson(createChartData(jsonToRootModel(x)))));
 	}
 
-	private RootModel jsonToRootModel(ConsumerRecord<String, String> x) {
+	public RootModel jsonToRootModel(ConsumerRecord<String, String> x) {
 		logger.info(x.value());
 		try {
 			return objectMapper.readValue(x.value(), RootModel.class);
@@ -66,5 +66,9 @@ public class KafkaConsumerScriptRawData {
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getTopic() {
+		return this.topic;
 	}
 }
