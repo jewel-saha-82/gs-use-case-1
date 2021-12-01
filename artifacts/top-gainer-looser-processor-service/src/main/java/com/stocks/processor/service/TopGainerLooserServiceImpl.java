@@ -2,6 +2,7 @@ package com.stocks.processor.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stocks.processor.constant.Constants;
+import com.stocks.processor.data.InMemoryData;
 import com.stocks.processor.model.*;
 import com.stocks.processor.producer.TopGainerLooserProducer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,12 @@ import java.util.*;
 @Service
 public class TopGainerLooserServiceImpl implements TopGainerLooserService{
 
-    List<ValuesModel> stocksData = new ArrayList<>();
 
-    MetaModel metaModel = null;
+    @Autowired
+    InMemoryData inMemoryData;
 
-    ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    ObjectMapper mapper;
 
     @Autowired
     private TopGainerLooserProducer producer;
@@ -28,10 +30,10 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
      */
     public void collectStocksDetails(RootModel rootModel){
 
-        if(Objects.isNull(metaModel)){
-            metaModel = rootModel.getMeta();
+        if(Objects.isNull(inMemoryData.getMetaModel())){
+            inMemoryData.setMetaModel(rootModel.getMeta());
         }
-        stocksData.add(rootModel.getValue());
+        inMemoryData.getStocksData().add(rootModel.getValue());
     }
 
     /**
@@ -40,49 +42,74 @@ public class TopGainerLooserServiceImpl implements TopGainerLooserService{
      */
     public TopGainerLooserData getTopGainerLooserStocks(){
 
-        if(stocksData.size() == 0){
+        if(inMemoryData.getStocksData().size() == 0){
             return new TopGainerLooserData();
         }
 
-        ValuesModel maxValue = stocksData.stream().
-                max(Comparator.comparing(ValuesModel::getClose))
-                .get();
         TopGainerLooserData topGainerData = new TopGainerLooserData();
-        topGainerData.setSymbol(metaModel.getSymbol());
-        topGainerData.setStock_name(metaModel.getSymbol());
-        topGainerData.setDate(maxValue.getDatetime());
-        topGainerData.setChange_price(String.valueOf(
-                Float.valueOf(maxValue.getClose()) - Float.valueOf(maxValue.getOpen())));
-        topGainerData.setClosing_price(maxValue.getClose());
-        topGainerData.setCurrency(metaModel.getCurrency());
-        topGainerData.setStatus(Constants.GAINER);
-        producer.produceTopGainerLooser(topGainerData);
-
-
-        ValuesModel minValue = stocksData.stream().
-                min(Comparator.comparing(ValuesModel::getClose))
-                .get();
-        TopGainerLooserData topLooserData = new TopGainerLooserData();
-        topLooserData.setSymbol(metaModel.getSymbol());
-        topLooserData.setStock_name(metaModel.getSymbol());
-        topLooserData.setDate(minValue.getDatetime());
-        topLooserData.setChange_price(String.valueOf(
-                Float.valueOf(minValue.getClose()) - Float.valueOf(minValue.getOpen())));
-        topLooserData.setClosing_price(minValue.getClose());
-        topLooserData.setCurrency(metaModel.getCurrency());
-        topLooserData.setStatus(Constants.LOOSER);
-        producer.produceTopGainerLooser(topLooserData);
+            producer.produceTopGainerLooser(getTopGainer());
+            producer.produceTopGainerLooser(getTopLooser());
 
         clearStocksData();
         return topGainerData;
     }
 
     /**
+     * get to gainer stock details
+     * @return
+     */
+    private TopGainerLooserData getTopGainer(){
+        try {
+            TopGainerLooserData topGainerData = new TopGainerLooserData();
+            ValuesModel maxValue = inMemoryData.getStocksData().stream().
+                    max(Comparator.comparing(ValuesModel::getClose))
+                    .get();
+
+            topGainerData.setSymbol(inMemoryData.getMetaModel().getSymbol());
+            topGainerData.setStock_name(inMemoryData.getMetaModel().getSymbol());
+            topGainerData.setDate(maxValue.getDatetime());
+            topGainerData.setChange_price(String.valueOf(
+                    Float.valueOf(maxValue.getClose()) - Float.valueOf(maxValue.getOpen())));
+            topGainerData.setClosing_price(maxValue.getClose());
+            topGainerData.setCurrency(inMemoryData.getMetaModel().getCurrency());
+            topGainerData.setStatus(Constants.GAINER);
+            return topGainerData;
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    /**
+     * get top looser stock details
+     * @return
+     */
+    private TopGainerLooserData getTopLooser(){
+        try {
+            ValuesModel minValue = inMemoryData.getStocksData().stream().
+                    min(Comparator.comparing(ValuesModel::getClose))
+                    .get();
+            TopGainerLooserData topLooserData = new TopGainerLooserData();
+            topLooserData.setSymbol(inMemoryData.getMetaModel().getSymbol());
+            topLooserData.setStock_name(inMemoryData.getMetaModel().getSymbol());
+            topLooserData.setDate(minValue.getDatetime());
+            topLooserData.setChange_price(String.valueOf(
+                    Float.valueOf(minValue.getClose()) - Float.valueOf(minValue.getOpen())));
+            topLooserData.setClosing_price(minValue.getClose());
+            topLooserData.setCurrency(inMemoryData.getMetaModel().getCurrency());
+            topLooserData.setStatus(Constants.LOOSER);
+            return topLooserData;
+        }catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+
+    /**
      * clear data from stocks values list
      */
     private void clearStocksData(){
-        stocksData.clear();
-        metaModel = null;
+        inMemoryData.getStocksData().clear();
+        inMemoryData.setMetaModel(null);
     }
 
 }

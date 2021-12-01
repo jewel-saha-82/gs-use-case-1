@@ -1,9 +1,10 @@
 package com.stocks.processor.config;
 
 import com.stocks.processor.model.RootModel;
+import com.stocks.processor.properties.AppProperties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -19,17 +20,14 @@ import java.util.Map;
 @Configuration
 public class KafkaConsumerConfiguration {
 
-    @Value("${kafka.bootstrap-server}")
-    private String bootstrapServer;
-
-    @Value("${kafka.groupId}")
-    private String groupId;
+    @Autowired
+    AppProperties properties;
 
     @Bean
     public ConsumerFactory<String, RootModel> rawDataConsumerFactory() {
         Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServer());
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, properties.getGroupId());
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
